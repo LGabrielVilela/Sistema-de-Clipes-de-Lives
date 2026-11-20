@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+yt-dlp[default]
+faster-whisper
+anthropic>=2.10
+pydantic>=2
+numpy
+opencv-python-headless
+python-dotenv
+# Aceleração por GPU NVIDIA para a transcrição (Windows/Linux)
+nvidia-cublas-cu12
+nvidia-cudnn-cu12==9.*
+google-api-python-client
+google-auth-oauthlib
+requests
+streamlink

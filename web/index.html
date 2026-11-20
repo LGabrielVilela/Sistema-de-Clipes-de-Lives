@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cortador de Lives</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/web/style.css?v=20261119c">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="rec" id="recDot" aria-hidden="true"></span>
+      <span class="wordmark">Cortador</span>
+    </div>
+    <nav class="tabs" aria-label="Seções">
+      <button type="button" data-tab="cortes" aria-current="page">Cortes</button>
+      <button type="button" data-tab="streamers">Streamers<span class="tab-badge" id="liveBadge" hidden></span></button>
+      <button type="button" data-tab="agenda">Agenda<span class="tab-badge" id="pendingBadge" hidden></span></button>
+      <button type="button" data-tab="contas">Contas</button>
+    </nav>
+    <div class="health" id="health" aria-live="polite"></div>
+  </header>
+
+  <section class="page" id="page-streamers" hidden></section>
+  <section class="page" id="page-agenda" hidden></section>
+  <section class="page" id="page-contas" hidden></section>
+
+  <main class="layout" id="page-cortes">
+    <aside class="side">
+      <details class="new-job-box" id="newJobBox" open>
+      <summary>Novo vídeo ou live</summary>
+      <form id="newJob" class="new-job" autocomplete="off">
+        <label class="url-label" for="url">Link do vídeo ou da live</label>
+        <input id="url" name="url" type="url" required placeholder="YouTube, Twitch, Kick…">
+
+        <div class="mode" role="radiogroup" aria-label="Tipo de link">
+          <label><input type="radio" name="mode" value="video" checked><span>Vídeo gravado</span></label>
+          <label><input type="radio" name="mode" value="live"><span>Live agora</span></label>
+        </div>
+
+        <div class="fields">
+          <label class="field pair">
+            <span id="numLabel">Cortes</span>
+            <input type="number" name="num_clips" min="1" max="20" value="5">
+          </label>
+          <label class="field pair">
+            <span>Duração do corte (s)</span>
+            <input type="number" name="clip_seconds" min="10" max="120" value="30" title="O corte fica perto desse tempo (±3 s), sempre começando e terminando no fim de uma fala">
+          </label>
+          <label class="field live-only pair">
+            <span>Cortar a cada (min)</span>
+            <input type="number" name="block_minutes" min="3" max="120" value="15">
+          </label>
+          <label class="field live-only pair">
+            <span>Gravar no máximo (min)</span>
+            <input type="number" name="live_minutes" min="1" max="720" value="120">
+          </label>
+          <label class="field video-only pair">
+            <span>Só a partir do min.</span>
+            <input type="number" name="section_start" min="0" step="1" placeholder="início">
+          </label>
+          <label class="field video-only pair">
+            <span>Até o min.</span>
+            <input type="number" name="section_end" min="1" step="1" placeholder="fim">
+          </label>
+          <label class="field">
+            <span>Enquadramento</span>
+            <select name="layout">
+              <option value="auto">Automático (detecta webcam e rosto)</option>
+              <option value="split">Webcam em cima + jogo embaixo</option>
+              <option value="crop">Tela cheia seguindo o rosto</option>
+              <option value="blur">Vídeo inteiro + fundo desfocado</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Idioma da fala</span>
+            <select name="language">
+              <option value="pt">Português</option>
+              <option value="en">Inglês</option>
+              <option value="es">Espanhol</option>
+              <option value="">Detectar sozinho</option>
+            </select>
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" name="title_overlay" checked> Título no topo do vídeo</label>
+        <label class="check" title="O vídeo abre com 2 a 3 segundos do clímax e depois volta ao começo da história"><input type="checkbox" name="cold_open" checked> Gancho no início (abre com o clímax)</label>
+        <label class="check" title="O fim do vídeo se funde com o começo: quando o Short recomeça, a emenda fica natural"><input type="checkbox" name="loop_end" checked> Final em loop</label>
+
+        <button class="primary" type="submit">Gerar cortes</button>
+        <p class="form-error" id="formError" role="alert"></p>
+      </form>
+      </details>
+
+      <section class="history">
+        <div class="history-head"><h2>Vídeos</h2><button class="link-btn" type="button" id="cleanup">Limpar concluídos</button></div>
+        <ul id="jobList" class="job-list"></ul>
+      </section>
+    </aside>
+
+    <section class="detail" id="detail" aria-live="polite"></section>
+  </main>
+
+  <template id="emptyTpl">
+    <div class="empty">
+      <h1>Cole um link para começar</h1>
+      <p>A ferramenta baixa o vídeo, transcreve a fala, encontra os momentos com mais chance de viralizar e entrega cortes verticais legendados, prontos para TikTok e Shorts.</p>
+      <ol class="how">
+        <li>Baixa o vídeo, ou grava a live em blocos e corta cada bloco enquanto ela continua</li>
+        <li>Transcreve a fala palavra por palavra</li>
+        <li>IA escolhe os melhores trechos usando a fala, o volume e o chat</li>
+        <li>Monta em 9:16 (webcam em cima e jogo embaixo, ou seguindo o rosto) com legenda animada</li>
+      </ol>
+    </div>
+  </template>
+
+  <script src="/web/app.js?v=20261119c"></script>
+  <script src="/web/robo.js?v=20261119c"></script>
+</body>
+</html>
